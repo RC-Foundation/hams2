@@ -1,0 +1,14 @@
+Contact: security@whisper-platform.org
+Expires: 2025-12-31T23:59:59.000Z
+Encryption: https://keys.openpgp.org/vks/v1/by-fingerprint/YOUR_PGP_FINGERPRINT
+Preferred-Languages: ar, en, fa
+Canonical: https://your-domain.com/.well-known/security.txt
+Policy: https://your-domain.com/security-policy
+Acknowledgments: https://your-domain.com/security-acknowledgments
+
+# Security Notice
+# This platform is designed for secure, anonymous whistleblowing.
+# All reports are encrypted end-to-end using PGP encryption.
+# We do not log IP addresses or store identifying information.
+# For maximum security, access this platform via Tor browser.
+# Onion address: whisper7x3k2m9n4p.onion
