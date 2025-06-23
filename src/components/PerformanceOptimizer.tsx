@@ -17,14 +17,6 @@ export const PerformanceOptimizer: React.FC = () => {
         });
       }
 
-      // Enable compression hints
-      if (performanceSettings.gzip_enabled) {
-        const meta = document.createElement('meta');
-        meta.httpEquiv = 'Content-Encoding';
-        meta.content = 'gzip';
-        document.head.appendChild(meta);
-      }
-
       // Inline critical CSS if under threshold
       const criticalCSS = document.querySelector('style[data-critical="true"]');
       if (criticalCSS) {
