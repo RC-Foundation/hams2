@@ -12,7 +12,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: false, // Don't persist sessions for anonymity
   },
   db: {
-    schema: 'public', // Set default schema to public
+    schema: 'api', // Set default schema to public
   },
 });
 
