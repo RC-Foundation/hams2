@@ -7,8 +7,6 @@ export const PanicButton: React.FC = () => {
   const { panicSettings } = usePlatformSettings();
 
   const handlePanicExit = () => {
-    if (!panicSettings) return;
-
     // Clear all sensitive data
     localStorage.clear();
     sessionStorage.clear();
@@ -25,15 +23,19 @@ export const PanicButton: React.FC = () => {
     }
 
     // Clear DOM if enabled
-    if (panicSettings.clear_dom) {
+    if (panicSettings?.clear_dom) {
       document.body.innerHTML = '';
     }
     
-    // Redirect to safe site
-    window.location.href = panicSettings.redirect_url;
+    // Redirect to safe site with fallback
+    const redirectUrl = panicSettings?.redirect_url || 'https://www.wikipedia.org';
+    try {
+      new URL(redirectUrl); // Validate URL
+      window.location.href = redirectUrl;
+    } catch {
+      window.location.href = 'https://www.wikipedia.org';
+    }
   };
-
-  if (!panicSettings) return null;
 
   return (
     <>

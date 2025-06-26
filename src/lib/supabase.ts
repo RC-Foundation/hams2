@@ -11,12 +11,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: false, // Don't persist sessions for anonymity
   },
-  db: {
-    schema: 'api', // Use 'api' schema as the default
-  },
 });
 
-// Database types for api schema
+// Database types
 export interface Report {
   id: string;
   reference_id: string;

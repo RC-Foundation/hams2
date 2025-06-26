@@ -30,16 +30,27 @@ export interface DraftSettings {
 class PlatformSettingsService {
   private async getSetting<T>(key: string): Promise<T | null> {
     try {
-      // Schema is already set to 'api' in supabase client, so just use table name
-      const { data, error } = await supabase
+      // Try both schemas to ensure compatibility
+      let { data, error } = await supabase
         .from('platform_settings')
         .select('setting_value')
         .eq('setting_key', key)
         .single();
 
       if (error) {
-        console.error(`Error fetching setting ${key}:`, error);
-        return null;
+        // Fallback to public schema if api schema fails
+        const result = await supabase
+          .schema('public')
+          .from('platform_settings')
+          .select('setting_value')
+          .eq('setting_key', key)
+          .single();
+        
+        if (result.error) {
+          console.error(`Error fetching setting ${key}:`, result.error);
+          return null;
+        }
+        data = result.data;
       }
 
       return data?.setting_value as T;

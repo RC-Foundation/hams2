@@ -23,8 +23,14 @@ export const useIdleTimeout = (settings: IdleTimeoutSettings | null) => {
       // Clear DOM if needed
       document.body.innerHTML = '';
       
-      // Redirect
-      window.location.href = settings.redirect_url;
+      // Redirect with fallback
+      const redirectUrl = settings.redirect_url || 'https://www.wikipedia.org';
+      try {
+        new URL(redirectUrl); // Validate URL
+        window.location.href = redirectUrl;
+      } catch {
+        window.location.href = 'https://www.wikipedia.org';
+      }
     };
 
     const resetTimer = () => {
