@@ -9,7 +9,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false, // Don't persist sessions for anonymity
+    persistSession: false, // Don't persist sessions for anonymity{
+  
+schema
+: 
+'public'
+, 
+// Set default schema to public
+
+}
   },
 });
 
