@@ -16,8 +16,8 @@ export interface ReportVerificationResult {
 class ReportService {
   async submitReport(data: SubmitReportData): Promise<boolean> {
     try {
-      // Try to insert the report
-      let { data: reportData, error: reportError } = await supabase
+      // Insert the report into public schema
+      const { data: reportData, error: reportError } = await supabase
         .from('reports')
         .insert({
           reference_id: data.referenceId,
@@ -29,26 +29,9 @@ class ReportService {
         .select()
         .single();
 
-      // If api schema fails, try public schema
       if (reportError) {
-        const result = await supabase
-          .schema('public')
-          .from('reports')
-          .insert({
-            reference_id: data.referenceId,
-            category: data.category,
-            encrypted_report_data: data.encryptedReportData,
-            file_count: data.files.length,
-            status: 'received'
-          })
-          .select()
-          .single();
-
-        if (result.error) {
-          console.error('Error inserting report:', result.error);
-          return false;
-        }
-        reportData = result.data;
+        console.error('Error inserting report:', reportError);
+        return false;
       }
 
       // Upload files if any
@@ -99,8 +82,8 @@ class ReportService {
           continue;
         }
 
-        // Insert file record
-        let { error: fileRecordError } = await supabase
+        // Insert file record into public schema
+        const { error: fileRecordError } = await supabase
           .from('report_files')
           .insert({
             report_id: reportId,
@@ -110,23 +93,9 @@ class ReportService {
             mime_type: file.type
           });
 
-        // Try public schema if api schema fails
         if (fileRecordError) {
-          const result = await supabase
-            .schema('public')
-            .from('report_files')
-            .insert({
-              report_id: reportId,
-              file_name: file.name,
-              file_path: uploadData.path,
-              file_size: file.size,
-              mime_type: file.type
-            });
-
-          if (result.error) {
-            console.error('Error inserting file record:', result.error);
-            allUploadsSuccessful = false;
-          }
+          console.error('Error inserting file record:', fileRecordError);
+          allUploadsSuccessful = false;
         }
       } catch (error) {
         console.error('Error processing file:', error);
@@ -139,49 +108,27 @@ class ReportService {
 
   async verifyReport(referenceId: string): Promise<ReportVerificationResult | null> {
     try {
-      // Get report by reference ID
-      let { data: reportData, error: reportError } = await supabase
+      // Get report by reference ID from public schema
+      const { data: reportData, error: reportError } = await supabase
         .from('reports')
         .select('*')
         .eq('reference_id', referenceId)
         .single();
 
-      // Try public schema if api schema fails
-      if (reportError) {
-        const result = await supabase
-          .schema('public')
-          .from('reports')
-          .select('*')
-          .eq('reference_id', referenceId)
-          .single();
-
-        if (result.error || !result.data) {
-          return null;
-        }
-        reportData = result.data;
+      if (reportError || !reportData) {
+        return null;
       }
 
-      // Get report updates
-      let { data: updatesData, error: updatesError } = await supabase
+      // Get report updates from public schema
+      const { data: updatesData, error: updatesError } = await supabase
         .from('report_updates')
         .select('*')
         .eq('report_id', reportData.id)
         .order('created_at', { ascending: true });
 
-      // Try public schema if api schema fails
       if (updatesError) {
-        const result = await supabase
-          .schema('public')
-          .from('report_updates')
-          .select('*')
-          .eq('report_id', reportData.id)
-          .order('created_at', { ascending: true });
-
-        if (result.error) {
-          console.error('Error fetching updates:', result.error);
-          return { report: reportData, updates: [] };
-        }
-        updatesData = result.data;
+        console.error('Error fetching updates:', updatesError);
+        return { report: reportData, updates: [] };
       }
 
       return {

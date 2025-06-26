@@ -32,32 +32,19 @@ export const TestSuite: React.FC = () => {
   };
 
   const runDatabaseSchemaTests = async () => {
-    // Test 1: Check if api schema exists and tables are accessible
+    // Test 1: Check if public schema tables are accessible
     try {
       updateTest('schema-check', 'pending', 'Checking database schema...');
       
-      // Try to access the reports table in api schema
       const { data: reports, error: reportsError } = await supabase
-        .from('api.reports')  // Changed to use api schema
+        .from('reports')
         .select('count')
         .limit(1);
       
       if (reportsError) {
-        // If api schema fails, try public schema as fallback
-        const { data: publicReports, error: publicError } = await supabase
-          .from('reports')
-          .select('count')
-          .limit(1);
-        
-        if (publicError) {
-          updateTest('schema-check', 'error', 'Neither api.reports nor reports table accessible', 
-            `API Schema Error: ${reportsError.message}\nPublic Schema Error: ${publicError.message}`);
-        } else {
-          updateTest('schema-check', 'warning', 'Using public schema instead of api schema', 
-            'Tables found in public schema, but migration expects api schema');
-        }
+        updateTest('schema-check', 'error', 'Reports table not accessible', reportsError.message);
       } else {
-        updateTest('schema-check', 'success', 'API schema configured correctly');
+        updateTest('schema-check', 'success', 'Public schema configured correctly');
       }
     } catch (error) {
       updateTest('schema-check', 'error', 'Schema check failed', error instanceof Error ? error.message : 'Unknown error');
@@ -103,16 +90,15 @@ export const TestSuite: React.FC = () => {
   };
 
   const runRLSTests = async () => {
-    // Test 4: Anonymous user permissions (INSERT) - Try both schemas
+    // Test 4: Anonymous user permissions (INSERT)
     try {
       updateTest('rls-insert', 'pending', 'Testing anonymous INSERT permissions...');
       
       const testReferenceId = generateSecureId();
       const testData = await encryptData('Test report data');
       
-      // First try api schema
-      let { data, error } = await supabase
-        .from('api.reports')
+      const { data, error } = await supabase
+        .from('reports')
         .insert({
           reference_id: testReferenceId,
           category: 'test',
@@ -124,35 +110,14 @@ export const TestSuite: React.FC = () => {
         .single();
       
       if (error) {
-        // Fallback to public schema
-        const result = await supabase
-          .from('reports')
-          .insert({
-            reference_id: testReferenceId,
-            category: 'test',
-            encrypted_report_data: testData,
-            file_count: 0,
-            status: 'received'
-          })
-          .select()
-          .single();
-        
-        if (result.error) {
-          updateTest('rls-insert', 'error', 'Anonymous INSERT failed in both schemas', 
-            `API Schema: ${error.message}\nPublic Schema: ${result.error.message}`);
-        } else {
-          updateTest('rls-insert', 'warning', 'INSERT working in public schema only', 
-            'Consider migrating to api schema for consistency');
-          data = result.data;
-        }
+        updateTest('rls-insert', 'error', 'Anonymous INSERT failed', error.message);
       } else {
-        updateTest('rls-insert', 'success', 'Anonymous INSERT working correctly in api schema');
-      }
-      
-      // Clean up test data if successful
-      if (data) {
-        await supabase.from('api.reports').delete().eq('id', data.id);
-        await supabase.from('reports').delete().eq('id', data.id);
+        updateTest('rls-insert', 'success', 'Anonymous INSERT working correctly');
+        
+        // Clean up test data
+        if (data) {
+          await supabase.from('reports').delete().eq('id', data.id);
+        }
       }
     } catch (error) {
       updateTest('rls-insert', 'error', 'RLS INSERT test failed', error instanceof Error ? error.message : 'Unknown error');
@@ -162,27 +127,15 @@ export const TestSuite: React.FC = () => {
     try {
       updateTest('rls-select', 'pending', 'Testing anonymous SELECT permissions...');
       
-      // Try api schema first
-      let { data, error } = await supabase
-        .from('api.reports')
+      const { data, error } = await supabase
+        .from('reports')
         .select('id, reference_id, status, created_at')
         .limit(1);
       
       if (error) {
-        // Fallback to public schema
-        const result = await supabase
-          .from('reports')
-          .select('id, reference_id, status, created_at')
-          .limit(1);
-        
-        if (result.error) {
-          updateTest('rls-select', 'error', 'Anonymous SELECT failed in both schemas', 
-            `API Schema: ${error.message}\nPublic Schema: ${result.error.message}`);
-        } else {
-          updateTest('rls-select', 'warning', 'SELECT working in public schema only');
-        }
+        updateTest('rls-select', 'error', 'Anonymous SELECT failed', error.message);
       } else {
-        updateTest('rls-select', 'success', 'Anonymous SELECT working correctly in api schema');
+        updateTest('rls-select', 'success', 'Anonymous SELECT working correctly');
       }
     } catch (error) {
       updateTest('rls-select', 'error', 'RLS SELECT test failed', error instanceof Error ? error.message : 'Unknown error');
@@ -192,29 +145,16 @@ export const TestSuite: React.FC = () => {
     try {
       updateTest('rls-settings', 'pending', 'Testing platform settings access...');
       
-      // Try api schema first
-      let { data, error } = await supabase
-        .from('api.platform_settings')
+      const { data, error } = await supabase
+        .from('platform_settings')
         .select('setting_key, setting_value')
         .eq('setting_key', 'encryption')
         .single();
       
       if (error) {
-        // Fallback to public schema
-        const result = await supabase
-          .from('platform_settings')
-          .select('setting_key, setting_value')
-          .eq('setting_key', 'encryption')
-          .single();
-        
-        if (result.error) {
-          updateTest('rls-settings', 'error', 'Platform settings access failed in both schemas', 
-            `API Schema: ${error.message}\nPublic Schema: ${result.error.message}`);
-        } else {
-          updateTest('rls-settings', 'warning', 'Platform settings accessible in public schema only');
-        }
+        updateTest('rls-settings', 'error', 'Platform settings access failed', error.message);
       } else {
-        updateTest('rls-settings', 'success', 'Platform settings accessible in api schema');
+        updateTest('rls-settings', 'success', 'Platform settings accessible');
       }
     } catch (error) {
       updateTest('rls-settings', 'error', 'Platform settings test failed', error instanceof Error ? error.message : 'Unknown error');
@@ -276,42 +216,11 @@ export const TestSuite: React.FC = () => {
     }
   };
 
-  const runSchemaDetectionTest = async () => {
-    // New test to detect which schema is being used
-    try {
-      updateTest('schema-detection', 'pending', 'Detecting active schema...');
-      
-      const apiSchemaWorks = await supabase.from('api.reports').select('count').limit(1).then(
-        ({ error }) => !error
-      );
-      
-      const publicSchemaWorks = await supabase.from('reports').select('count').limit(1).then(
-        ({ error }) => !error
-      );
-      
-      if (apiSchemaWorks && publicSchemaWorks) {
-        updateTest('schema-detection', 'warning', 'Both schemas exist', 
-          'Both public and api schemas have reports table. Consider consolidating.');
-      } else if (apiSchemaWorks) {
-        updateTest('schema-detection', 'success', 'Using api schema (recommended)');
-      } else if (publicSchemaWorks) {
-        updateTest('schema-detection', 'warning', 'Using public schema', 
-          'Consider migrating to api schema for better organization');
-      } else {
-        updateTest('schema-detection', 'error', 'No schema detected', 
-          'Neither api.reports nor reports table found');
-      }
-    } catch (error) {
-      updateTest('schema-detection', 'error', 'Schema detection failed', error instanceof Error ? error.message : 'Unknown error');
-    }
-  };
-
   const runAllTests = async () => {
     setIsRunning(true);
     setTests([]);
     
     try {
-      await runSchemaDetectionTest(); // Run this first
       await runDatabaseSchemaTests();
       await runEncryptionTests();
       await runRLSTests();
@@ -414,32 +323,6 @@ export const TestSuite: React.FC = () => {
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Detailed Test Results</h2>
             
-            {/* Schema Detection */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center mb-4">
-                <Database className="w-6 h-6 text-indigo-600 mr-2" />
-                <h3 className="text-lg font-semibold text-gray-900">Schema Detection</h3>
-              </div>
-              <div className="space-y-3">
-                {tests.filter(t => ['schema-detection'].includes(t.name)).map((test, index) => (
-                  <div key={index} className={`p-4 rounded-lg border ${getStatusColor(test.status)}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        {getStatusIcon(test.status)}
-                        <span className="ml-3 font-medium">{test.name}</span>
-                      </div>
-                      <span className="text-sm text-gray-600">{test.message}</span>
-                    </div>
-                    {test.details && (
-                      <div className="mt-2 text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                        {test.details}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Database Schema Tests */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center mb-4">
@@ -556,17 +439,11 @@ export const TestSuite: React.FC = () => {
               <li>Verify that the 'report-files' storage bucket exists</li>
               <li>Check that environment variables are properly configured</li>
             </ul>
-            <p className="mt-4"><strong>Schema Issues:</strong></p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>If tests show warnings about public schema, your app is using the old schema</li>
-              <li>Run the provided migration to move tables to api schema</li>
-              <li>Update your service files to use api.table_name format</li>
-            </ul>
             <p className="mt-4"><strong>Common Fixes:</strong></p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li><strong>Permission denied:</strong> Run the migration with proper GRANT statements</li>
               <li><strong>PGP encryption failed:</strong> Check if the public key is valid</li>
-              <li><strong>Schema detection warnings:</strong> Consolidate to single schema (api recommended)</li>
+              <li><strong>Table not found:</strong> Ensure migration has been run successfully</li>
             </ul>
           </div>
         </div>
