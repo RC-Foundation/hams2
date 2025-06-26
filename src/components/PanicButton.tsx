@@ -27,12 +27,18 @@ export const PanicButton: React.FC = () => {
       document.body.innerHTML = '';
     }
     
-    // Redirect to safe site with fallback
+    // Redirect to safe site with fallback and URL validation
     const redirectUrl = panicSettings?.redirect_url || 'https://www.wikipedia.org';
     try {
-      new URL(redirectUrl); // Validate URL
-      window.location.href = redirectUrl;
+      // Validate URL format
+      const url = new URL(redirectUrl);
+      if (url.protocol === 'https:' || url.protocol === 'http:') {
+        window.location.href = redirectUrl;
+      } else {
+        throw new Error('Invalid protocol');
+      }
     } catch {
+      // Fallback to safe default
       window.location.href = 'https://www.wikipedia.org';
     }
   };

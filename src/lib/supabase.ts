@@ -11,9 +11,6 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: false, // Don't persist sessions for anonymity
   },
-  db: {
-    schema: 'api', // Set default schema to public
-  },
 });
 
 // Database types
