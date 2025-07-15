@@ -28,6 +28,14 @@ const translations = {
       corruption: 'فساد في مؤسسات عامة (سابق أو حالي)',
       econ_corruption: 'فساد في قطاع الأعمال والشركات الخاصة',
       intel: 'معلومات أمنية أو استخباراتية غير عاجلة'
+    },
+    tip: {
+      title: 'مشاركة المعلومات عبر تطبيقات آمنة',
+      subtitle: 'لديك خيار التواصل معنا بشكل أكثر أماناً عبر واتساب أو سيجنال',
+      whatsappTitle: 'التواصل عبر واتساب',
+      whatsappBody: 'استخدم واتساب لإرسال رسائل مشفرة إلينا. تأكد من تعطيل النسخ الاحتياطي السحابي.',
+      signalTitle: 'التواصل عبر سيجنال',
+      signalBody: 'سيجنال يخزن بيانات أقل عن مستخدميه ويوفر رسائل ذاتية الاختفاء.'
     }
   },
   fa: {
@@ -49,6 +57,14 @@ const translations = {
       corruption: 'فساد در نهادهای عمومی (قبلی یا فعلی)',
       econ_corruption: 'فساد در بخش تجاری و شرکت‌های خصوصی',
       intel: 'اطلاعات امنیتی یا اطلاعاتی غیر فوری'
+    },
+    tip: {
+      title: 'اشتراک‌گذاری اطلاعات از طریق پیام‌رسان‌های امن',
+      subtitle: 'می‌توانید از واتس‌اپ یا سیگنال برای برقراری ارتباط امن استفاده کنید.',
+      whatsappTitle: 'تماس از طریق واتس‌اپ',
+      whatsappBody: 'پیام‌های واتس‌اپ رمزگذاری شده‌اند. پشتیبان‌گیری ابری را غیرفعال کنید.',
+      signalTitle: 'تماس از طریق سیگنال',
+      signalBody: 'سیگنال اطلاعات کمتری ذخیره می‌کند و امکان حذف خودکار پیام‌ها را دارد.'
     }
   },
   en: {
@@ -70,6 +86,14 @@ const translations = {
       corruption: 'Corruption in public institutions (past or current)',
       econ_corruption: 'Corruption in business sector and private companies',
       intel: 'Non-urgent security or intelligence information'
+    },
+    tip: {
+      title: 'Submit a Tip Securely',
+      subtitle: 'You can reach us through encrypted WhatsApp or Signal messages.',
+      whatsappTitle: 'Contact via WhatsApp',
+      whatsappBody: 'Use WhatsApp to send encrypted messages. Disable cloud backups.',
+      signalTitle: 'Contact via Signal',
+      signalBody: 'Signal stores minimal metadata and supports disappearing messages.'
     }
   }
 };

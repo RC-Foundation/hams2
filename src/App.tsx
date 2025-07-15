@@ -5,6 +5,7 @@ import { ReportForm } from './components/ReportForm';
 import { SecurityGuide } from './components/SecurityGuide';
 import { VerificationPage } from './components/VerificationPage';
 import { TestSuite } from './components/TestSuite';
+import { ContactPage } from './components/ContactPage';
 import { PanicButton } from './components/PanicButton';
 import { PerformanceOptimizer } from './components/PerformanceOptimizer';
 import { LoadingOptimizer } from './components/LoadingOptimizer';
@@ -25,6 +26,7 @@ function App() {
               <Route path="/report" element={<ReportForm />} />
               <Route path="/security" element={<SecurityGuide />} />
               <Route path="/verify" element={<VerificationPage />} />
+              <Route path="/tip" element={<ContactPage />} />
               <Route path="/test" element={<TestSuite />} />
             </Routes>
           </div>

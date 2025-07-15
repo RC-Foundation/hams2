@@ -187,6 +187,12 @@ export const HomePage: React.FC = () => {
             {t('securityGuide')}
           </Link>
           <Link
+            to="/tip"
+            className="px-6 py-3 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors font-medium"
+          >
+            {t('submitSecurely')}
+          </Link>
+          <Link
             to="/test"
             className="px-6 py-3 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg transition-colors font-medium flex items-center gap-2"
           >
