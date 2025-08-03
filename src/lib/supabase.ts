@@ -12,7 +12,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: false, // Don't persist sessions for anonymity
   },
   db: {
-    schema: 'api', // Set default schema to public
+    // Use dedicated "api" schema instead of default "public"
+    schema: 'api',
   },
 });
 
@@ -49,6 +50,6 @@ export interface ReportUpdate {
 export interface PlatformSetting {
   id: string;
   setting_key: string;
-  setting_value: any;
+  setting_value: unknown;
   updated_at: string;
 }
