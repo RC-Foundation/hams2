@@ -62,6 +62,7 @@ cp .env.example .env
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_AES_FALLBACK_KEY=your_aes_fallback_key
 ```
 
 5. **تشغيل الخادم المحلي**
@@ -73,9 +74,8 @@ npm run dev
 
 1. **إنشاء مشروع جديد** في [Supabase](https://supabase.com)
 
-2. **تشغيل Migration**
-   - انسخ محتوى `supabase/migrations/20250620110406_smooth_night.sql`
-   - نفذه في SQL Editor في Supabase
+2. **تشغيل Migrations**
+   - نفّذ جميع الملفات داخل مجلد `supabase/migrations` في محرر SQL لدى Supabase
 
 3. **إعداد Storage Bucket**
    - أنشئ bucket باسم `report-files`

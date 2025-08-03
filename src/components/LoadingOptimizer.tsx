@@ -7,7 +7,12 @@ export const LoadingOptimizer: React.FC = () => {
     // Optimize loading for slow connections
     const optimizeForSlowConnections = () => {
       // Check connection speed
-      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+      const nav = navigator as Navigator & {
+        connection?: { effectiveType?: string };
+        mozConnection?: { effectiveType?: string };
+        webkitConnection?: { effectiveType?: string };
+      };
+      const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
       
       if (connection) {
         const slowConnection = connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g';
@@ -25,20 +30,6 @@ export const LoadingOptimizer: React.FC = () => {
           });
         }
       }
-
-      // Preload critical resources
-      const criticalResources = [
-        '/assets/index.css',
-        '/assets/index.js'
-      ];
-
-      criticalResources.forEach(resource => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.href = resource;
-        link.as = resource.endsWith('.css') ? 'style' : 'script';
-        document.head.appendChild(link);
-      });
 
       setIsLoading(false);
     };

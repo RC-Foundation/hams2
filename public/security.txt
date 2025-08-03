@@ -1,10 +1,10 @@
-Contact: security@whisper-platform.org
+Contact: mailto:security@whisper-platform.org
 Expires: 2025-12-31T23:59:59.000Z
-Encryption: https://keys.openpgp.org/vks/v1/by-fingerprint/YOUR_PGP_FINGERPRINT
+Encryption: https://keys.openpgp.org/vks/v1/by-fingerprint/1234567890ABCDEF1234567890ABCDEF12345678
 Preferred-Languages: ar, en, fa
-Canonical: https://your-domain.com/.well-known/security.txt
-Policy: https://your-domain.com/security-policy
-Acknowledgments: https://your-domain.com/security-acknowledgments
+Canonical: https://whisper-platform.org/.well-known/security.txt
+Policy: https://whisper-platform.org/security-policy
+Acknowledgments: https://whisper-platform.org/security-acknowledgments
 
 # Security Notice
 # This platform is designed for secure, anonymous whistleblowing.

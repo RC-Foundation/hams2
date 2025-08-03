@@ -20,6 +20,7 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [isSecureConnection, setIsSecureConnection] = useState(false);
   const [securityScore, setSecurityScore] = useState(0);
   const [publicKey, setPublicKey] = useState<string | null>(null);
+  const fallbackKey = import.meta.env.VITE_AES_FALLBACK_KEY || 'development_fallback_key';
   
   const { encryptionSettings, idleTimeoutSettings } = usePlatformSettings();
   
@@ -73,7 +74,7 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (!publicKey || publicKey.trim() === '') {
         console.warn('No PGP public key available, using AES fallback');
         // Use AES encryption as fallback
-        const encrypted = CryptoJS.AES.encrypt(data, 'secure-fallback-key-' + Date.now()).toString();
+        const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
         return encrypted;
       }
 
@@ -83,7 +84,7 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (!cleanKey.includes('-----BEGIN PGP PUBLIC KEY BLOCK-----') || 
           !cleanKey.includes('-----END PGP PUBLIC KEY BLOCK-----')) {
         console.warn('Invalid PGP public key format, using AES fallback');
-        const encrypted = CryptoJS.AES.encrypt(data, 'secure-fallback-key-' + Date.now()).toString();
+        const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
         return encrypted;
       }
 
@@ -97,13 +98,13 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
         return encrypted;
       } catch (pgpError) {
         console.warn('PGP encryption failed, using AES fallback:', pgpError);
-        const encrypted = CryptoJS.AES.encrypt(data, 'secure-fallback-key-' + Date.now()).toString();
+        const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
         return encrypted;
       }
     } catch (error) {
       console.error('Encryption failed completely:', error);
       // Final fallback to AES encryption
-      const encrypted = CryptoJS.AES.encrypt(data, 'secure-fallback-key-' + Date.now()).toString();
+      const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
       return encrypted;
     }
   };
@@ -124,6 +125,7 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
 
       img.onload = () => {
         // Resize if too large
@@ -143,6 +145,7 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
         ctx?.drawImage(img, 0, 0, width, height);
 
         canvas.toBlob((blob) => {
+          URL.revokeObjectURL(objectUrl);
           if (blob) {
             const cleanFile = new File([blob], file.name, {
               type: 'image/jpeg',
@@ -155,8 +158,12 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
         }, 'image/jpeg', 0.8);
       };
 
-      img.onerror = () => resolve(file);
-      img.src = URL.createObjectURL(file);
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(file);
+      };
+
+      img.src = objectUrl;
     });
   };
 
