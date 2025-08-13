@@ -13,7 +13,10 @@ export const LoadingOptimizer: React.FC = () => {
         webkitConnection?: { effectiveType?: string };
       };
       const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
+45wgrc-codex/verify-functionality-of-hams-website
+      
 
+main
       if (connection) {
         const slowConnection = connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g';
         
@@ -31,6 +34,8 @@ export const LoadingOptimizer: React.FC = () => {
         }
       }
 
+45wgrc-codex/verify-functionality-of-hams-website
+
       // Preload critical resources using actual build asset URLs
       const criticalResources: string[] = [];
       const cssLink = document.querySelector('link[rel="stylesheet"][href]') as HTMLLinkElement | null;
@@ -47,6 +52,7 @@ export const LoadingOptimizer: React.FC = () => {
         document.head.appendChild(link);
       });
 
+main
       setIsLoading(false);
     };
 

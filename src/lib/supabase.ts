@@ -12,8 +12,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: false, // Don't persist sessions for anonymity
   },
   db: {
+45wgrc-codex/verify-functionality-of-hams-website
+    schema: 'api', // Set default schema to 'api'
+
     // Use dedicated "api" schema instead of default "public"
     schema: 'api',
+main
   },
 });
 

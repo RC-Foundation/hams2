@@ -62,7 +62,11 @@ cp .env.example .env
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+  45wgrc-codex/verify-functionality-of-hams-website
+VITE_AES_FALLBACK_KEY=your_aes_fallback_key
+  
 VITE_AES_FALLBACK_KEY=your_persistent_aes_key
+ main
 ```
 
 5. **تشغيل الخادم المحلي**
@@ -74,9 +78,14 @@ npm run dev
 
 1. **إنشاء مشروع جديد** في [Supabase](https://supabase.com)
 
+45wgrc-codex/verify-functionality-of-hams-website
+2. **تشغيل Migrations**
+   - نفّذ جميع الملفات داخل مجلد `supabase/migrations` في محرر SQL لدى Supabase
+
 2. **تشغيل Migration**
    - انسخ محتوى `.bolt/supabase_discarded_migrations/20250626124600_polished_wildflower.sql`
    - نفذه في SQL Editor في Supabase
+main
 
 3. **إعداد Storage Bucket**
    - أنشئ bucket باسم `report-files`

@@ -20,8 +20,12 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [isSecureConnection, setIsSecureConnection] = useState(false);
   const [securityScore, setSecurityScore] = useState(0);
   const [publicKey, setPublicKey] = useState<string | null>(null);
+45wgrc-codex/verify-functionality-of-hams-website
+  const fallbackKey = import.meta.env.VITE_AES_FALLBACK_KEY || 'development_fallback_key';
+
 
   const AES_FALLBACK_KEY = import.meta.env.VITE_AES_FALLBACK_KEY || 'secure-fallback-key';
+main
   
   const { encryptionSettings, idleTimeoutSettings } = usePlatformSettings();
   
@@ -78,7 +82,13 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       if (!publicKey || publicKey.trim() === '') {
         console.warn('No PGP public key available, using AES fallback');
+45wgrc-codex/verify-functionality-of-hams-website
+        // Use AES encryption as fallback
+        const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
+        return encrypted;
+
         return encryptWithAes(data);
+main
       }
 
       const cleanKey = publicKey.trim();
@@ -86,7 +96,12 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
       if (!cleanKey.includes('-----BEGIN PGP PUBLIC KEY BLOCK-----') ||
           !cleanKey.includes('-----END PGP PUBLIC KEY BLOCK-----')) {
         console.warn('Invalid PGP public key format, using AES fallback');
+45wgrc-codex/verify-functionality-of-hams-website
+        const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
+        return encrypted;
+
         return encryptWithAes(data);
+main
       }
 
       try {
@@ -98,11 +113,22 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
         });
       } catch (pgpError) {
         console.warn('PGP encryption failed, using AES fallback:', pgpError);
+45wgrc-codex/verify-functionality-of-hams-website
+        const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
+        return encrypted;
+      }
+    } catch (error) {
+      console.error('Encryption failed completely:', error);
+      // Final fallback to AES encryption
+      const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
+      return encrypted;
+
         return encryptWithAes(data);
       }
     } catch (error) {
       console.error('Encryption failed completely:', error);
       return encryptWithAes(data);
+main
     }
   };
 
