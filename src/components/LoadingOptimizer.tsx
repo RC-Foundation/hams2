@@ -13,7 +13,7 @@ export const LoadingOptimizer: React.FC = () => {
         webkitConnection?: { effectiveType?: string };
       };
       const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
-45wgrc-codex/verify-functionality-of-hams-website
+45grc-codex/verify-functionality-of-hams-website
       
 
 main
