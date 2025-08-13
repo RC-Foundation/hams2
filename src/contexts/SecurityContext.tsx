@@ -20,7 +20,12 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [isSecureConnection, setIsSecureConnection] = useState(false);
   const [securityScore, setSecurityScore] = useState(0);
   const [publicKey, setPublicKey] = useState<string | null>(null);
+45wgrc-codex/verify-functionality-of-hams-website
   const fallbackKey = import.meta.env.VITE_AES_FALLBACK_KEY || 'development_fallback_key';
+
+
+  const AES_FALLBACK_KEY = import.meta.env.VITE_AES_FALLBACK_KEY || 'secure-fallback-key';
+main
   
   const { encryptionSettings, idleTimeoutSettings } = usePlatformSettings();
   
@@ -69,35 +74,46 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
     checkSecurity();
   }, []);
 
+  const encryptWithAes = (text: string): string => {
+    return CryptoJS.AES.encrypt(text, AES_FALLBACK_KEY).toString();
+  };
+
   const encryptData = async (data: string): Promise<string> => {
     try {
       if (!publicKey || publicKey.trim() === '') {
         console.warn('No PGP public key available, using AES fallback');
+45wgrc-codex/verify-functionality-of-hams-website
         // Use AES encryption as fallback
         const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
         return encrypted;
+
+        return encryptWithAes(data);
+main
       }
 
-      // Clean and validate the public key format
       const cleanKey = publicKey.trim();
-      
-      if (!cleanKey.includes('-----BEGIN PGP PUBLIC KEY BLOCK-----') || 
+
+      if (!cleanKey.includes('-----BEGIN PGP PUBLIC KEY BLOCK-----') ||
           !cleanKey.includes('-----END PGP PUBLIC KEY BLOCK-----')) {
         console.warn('Invalid PGP public key format, using AES fallback');
+45wgrc-codex/verify-functionality-of-hams-website
         const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
         return encrypted;
+
+        return encryptWithAes(data);
+main
       }
 
       try {
         const key = await openpgp.readKey({ armoredKey: cleanKey });
         const message = await openpgp.createMessage({ text: data });
-        const encrypted = await openpgp.encrypt({
+        return await openpgp.encrypt({
           message,
           encryptionKeys: key,
         });
-        return encrypted;
       } catch (pgpError) {
         console.warn('PGP encryption failed, using AES fallback:', pgpError);
+45wgrc-codex/verify-functionality-of-hams-website
         const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
         return encrypted;
       }
@@ -106,6 +122,13 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
       // Final fallback to AES encryption
       const encrypted = CryptoJS.AES.encrypt(data, fallbackKey).toString();
       return encrypted;
+
+        return encryptWithAes(data);
+      }
+    } catch (error) {
+      console.error('Encryption failed completely:', error);
+      return encryptWithAes(data);
+main
     }
   };
 
@@ -131,7 +154,7 @@ export const SecurityProvider: React.FC<{ children: ReactNode }> = ({ children }
         // Resize if too large
         const maxDim = 1024;
         let { width, height } = img;
-        
+
         if (width > height && width > maxDim) {
           height = (height * maxDim) / width;
           width = maxDim;
